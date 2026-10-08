@@ -7,11 +7,13 @@ swap in one click. Speaker notes come straight from slides.json.
     python3 -m pip install python-pptx pillow
     python3 presentation/build/build_pptx.py
 """
+import copy
 import json
 from pathlib import Path
 
 from PIL import Image
 from pptx import Presentation
+from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.util import Emu, Inches
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +57,14 @@ def fit_picture(slide, path, left, top, max_w, max_h):
     slide.shapes.add_picture(str(path), x, y, w, h)
 
 
+def add_author_date(slide):
+    """Copy the layout's footer placeholder onto the slide and fill in author and date."""
+    footer = next(p for p in slide.slide_layout.placeholders if p.placeholder_format.type == PP_PLACEHOLDER.FOOTER)
+    slide.shapes._spTree.append(copy.deepcopy(footer._element))
+    ph = next(p for p in slide.placeholders if p.placeholder_format.type == PP_PLACEHOLDER.FOOTER)
+    ph.text_frame.text = SPEC["meta"]["author_date"]
+
+
 def set_lines(text_frame, text):
     lines = text.split("\n")
     text_frame.text = lines[0]
@@ -68,6 +78,7 @@ for s in SPEC["slides"]:
         slide = prs.slides.add_slide(L["Title Slide"])
         slide.shapes.title.text = s["title"]
         set_lines(slide.placeholders[1].text_frame, s.get("subtitle", ""))
+        add_author_date(slide)
     elif t in ("statement", "bigfact"):
         slide = prs.slides.add_slide(L["Section Header"])
         set_lines(slide.shapes.title.text_frame, s["title"])

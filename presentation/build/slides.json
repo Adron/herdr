@@ -2,13 +2,14 @@
   "meta": {
     "title": "Herding Agents",
     "author": "Adron Hall",
-    "date": "2026-10-07"
+    "date": "2026-10-08",
+    "author_date": "Adron Hall · October 8, 2026"
   },
   "slides": [
     {
       "type": "title",
       "title": "Herding Agents",
-      "subtitle": "Herdr, an ultrawide, and precise words\nAdron Hall · October 2026",
+      "subtitle": "Herdr, an ultrawide, and precise words",
       "notes": "Welcome. This talk covers how I run several AI coding agents at once (Claude Code, Codex, Cursor) without losing track of them, and without them losing track of what I asked for.\n\nThree pieces: Herdr, a terminal workspace manager built for coding agents; a 5120×1440 ultrawide monitor; and precise language in the prompts.\n\nEverything here is written up in two companion articles in this repo (articles/01 and articles/02), and I'll publish them on compositecode.blog.\n\nRefs:\n- Herdr: https://herdr.dev\n- Blog: https://compositecode.blog/"
     },
     {

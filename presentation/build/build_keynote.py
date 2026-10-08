@@ -63,6 +63,13 @@ for s in SPEC["slides"]:
     if t == "title":
         lines.append(f"set object text of default title item of s to {q(s['title'])}")
         lines.append(f"set object text of default body item of s to {q(s.get('subtitle', ''))}")
+        # the Title master's "Author and Date" placeholder: the empty text item at the bottom
+        lines += [
+            "repeat with t in text items of s",
+            f"if object text of t is \"\" and (item 2 of (get position of t)) > {H // 2} then "
+            f"set object text of t to {q(SPEC['meta']['author_date'])}",
+            "end repeat",
+        ]
     elif t == "bigfact":
         # Big Fact: the body is the big number, the title is its caption
         lines.append(f"set object text of default body item of s to {q(s['title'])}")
