@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "title": "Herding Agents",
+    "author": "Adron Hall",
+    "date": "2026-10-07"
+  },
+  "slides": [
+    {
+      "type": "title",
+      "title": "Herding Agents",
+      "subtitle": "Herdr, an ultrawide, and precise words\nAdron Hall · October 2026",
+      "notes": "Welcome. This talk covers how I run several AI coding agents at once (Claude Code, Codex, Cursor) without losing track of them, and without them losing track of what I asked for.\n\nThree pieces: Herdr, a terminal workspace manager built for coding agents; a 5120×1440 ultrawide monitor; and precise language in the prompts.\n\nEverything here is written up in two companion articles in this repo (articles/01 and articles/02), and I'll publish them on compositecode.blog.\n\nRefs:\n- Herdr: https://herdr.dev\n- Blog: https://compositecode.blog/"
+    },
+    {
+      "type": "statement",
+      "title": "One agent is a tool.\nSix is a zoo.",
+      "notes": "Opening tension. One agent is easy to manage: you watch it. Two is a pair. Past three, you're a zookeeper, and somebody has to know which animal is chewing on the fence.\n\nThe real cost isn't agents doing the wrong thing. It's agents doing nothing, sitting at a yes/no question for twenty minutes because they don't tap you on the shoulder. Wall-clock time is the most expensive resource in the whole setup.\n\nPause here. Let it land."
+    },
+    {
+      "type": "image",
+      "title": "A normal Tuesday",
+      "image": "03-ultrawide-agent-blocked-on-scope.png",
+      "notes": "This is the full 5120×1440 ultrawide: one Herdr window, one space (ledger-service), the implementation tab. Two agents side by side, and a diffstat stacked over a shell on the right.\n\nThe middle agent is blocked. It's asking me a scoping question. We'll come back to exactly why it stopped; that's the payoff of the second half of the talk.\n\nFor now, just notice that everything is on screen at once and nothing is hidden behind a tab.\n\nAll screenshots were captured on Herdr 0.8.0 in an isolated named session against throwaway demo repos, with Claude Code in plan mode."
+    },
+    {
+      "type": "bullets",
+      "title": "Herdr",
+      "bullets": [
+        "Terminal workspace manager for coding agents",
+        "One Rust binary, runs in your terminal",
+        "Detach anytime, agents keep working",
+        "Knows when an agent needs you"
+      ],
+      "notes": "What Herdr is, in four lines.\n\n1. It's built for running AI coding agents: Claude Code, Codex, Cursor's agent, Copilot CLI, OpenCode, Devin, and more.\n2. A single Rust binary. No Electron. It runs inside iTerm, Ghostty, WezTerm, kitty, Alacritty, even inside tmux.\n3. Client/server. A background server owns the terminals; the window is just a client. Close it, drop SSH, and everything keeps running. (While making these screenshots the demo window got closed mid-run; every agent was still there on reattach.)\n4. Agent-state detection. That's the point, and it's coming up.\n\nInstall: brew install herdr, or curl -fsSL https://herdr.dev/install.sh | sh\n\nRefs:\n- https://herdr.dev\n- https://herdr.dev/docs/install/\n- https://github.com/herdrdev/herdr"
+    },
+    {
+      "type": "statement",
+      "title": "Session › Space › Tab › Pane",
+      "notes": "The four nouns, straight from the Herdr concepts page.\n\n- Session: a persistent server namespace. `herdr` attaches to the default; `herdr --session name` gives you an isolated one.\n- Workspace (the sidebar calls them spaces): \"the top-level project container. Use one workspace per repo, task, or investigation.\"\n- Tab: \"a layout inside a workspace.\"\n- Pane: \"a real terminal.\"\n\nIf you know tmux, you already have most of this model. The difference is what Herdr knows about what's running in each pane.\n\nRef: https://herdr.dev/docs/concepts/"
+    },
+    {
+      "type": "image-side",
+      "title": "Blocked. Working. Done. Idle.",
+      "image": "08-crop-sidebar-spaces-and-agents.png",
+      "notes": "The sidebar. Spaces up top, every agent across every space listed below with a state dot.\n\n- Blocked: needs input, approval, or a decision. This is the one you care about.\n- Working: chewing.\n- Done: finished, and you haven't looked yet.\n- Idle: finished, and you have looked.\n- Unknown: Herdr can't tell, usually a plain shell.\n\nThis is the shoulder tap agents never gave me.\n\nTip: run `herdr integration install claude` (or codex, copilot, opencode…) so the agent reports its own lifecycle through a hook instead of Herdr inferring it from the screen. `herdr integration status` shows what's wired.\n\nRefs:\n- https://herdr.dev/docs/concepts/\n- https://herdr.dev/docs/agents/"
+    },
+    {
+      "type": "statement",
+      "title": "One space per folder",
+      "notes": "Rule one. Every folder I'm actively working in gets a space, named after the folder. Today that's about ten: interlinedlist plus its iOS, macOS, Windows, and Android siblings, an architecture migration, a couple of other projects, and this repo.\n\nWhy folders? Because an agent's working directory is the edge of its universe. The space draws the same boundary the agent already lives in, and makes it visible to me.\n\nThere's no 'misc' space. Misc is where context goes to die.\n\nMy config even sorts the agent list by space: agent_panel_sort = \"spaces\"."
+    },
+    {
+      "type": "image",
+      "title": "Spaces mirror my head",
+      "image": "05-ultrawide-second-space-implementation.png",
+      "notes": "A second space, transit-tracker, with its own implementation tab. Different folder, different agent, different world.\n\nThe sidebar is a direct readout of my working memory. If a folder isn't in it, I'm not working on it. When I'm done with a folder, the space goes away.\n\nThis is mostly for my own mental organization. The agents don't care what the sidebar looks like. I do.\n\nRelated: when two agents need the same repo at once, each gets a git worktree, which is just another folder, so another space. `herdr worktree create` does it directly.\nRef: https://compositecode.blog/2026/08/19/worktrees/"
+    },
+    {
+      "type": "bullets",
+      "title": "One tab per kind of work",
+      "bullets": [
+        "domain-modeling: think",
+        "implementation: change",
+        "pr-reviews: judge"
+      ],
+      "notes": "Rule two. Tabs aren't 'more room.' Tabs are modes, and each one is a different verb.\n\n- domain-modeling: the agent thinks and doesn't type. Plan mode. Glossary and domain notes open beside it.\n- implementation: the agent changes code inside an explicit scope, after an approved plan.\n- pr-reviews: the agent reads the diff and reports findings. It doesn't fix.\n\nWhat I'm designing against is verb drift: a reviewer that slides into rewriting the module. The tab is the line it has to cross, drawn on screen.\n\nIt also switches my own hat. When I land on a tab called pr-reviews, I'm in review mode before I read a word.\n\nRef: Ask, Plan, Confirm: https://compositecode.blog/2026/08/20/plan-then-build/"
+    },
+    {
+      "type": "image",
+      "title": "domain-modeling",
+      "image": "01-ultrawide-domain-modeling-tab.png",
+      "notes": "Domain-modeling tab in ledger-service. One agent column on the left. On the right, the domain notes and the entity code on top, git history below.\n\nThe agent was asked to describe a Posting aggregate using only Account, Entry, Journal, Posting, never 'transaction', and not to write code. We'll zoom in on the result later.\n\nThe reference panes aren't decoration. They're there so I can check the agent's vocabulary against the agreed vocabulary without switching anything."
+    },
+    {
+      "type": "image",
+      "title": "implementation",
+      "image": "02-ultrawide-implementation-tab.png",
+      "notes": "Implementation tab. Two agents, each fenced to a different slice of the code: one planning tests for Posting.Validate, one planning a CLI entrypoint in cmd/main.go only.\n\nOn the right, a diffstat over a shell, so I can see what actually changed, not what the agent says changed.\n\nIn real work, parallel implementation agents on one repo each get their own worktree and branch.\nRef: https://compositecode.blog/2026/08/19/worktrees/"
+    },
+    {
+      "type": "image",
+      "title": "pr-reviews",
+      "image": "04-ultrawide-pr-reviews-tab.png",
+      "notes": "PR-reviews tab. Reviewer on the left, raw diff on the right.\n\nEvery file:line the reviewer cites can be checked by moving my eyes and nothing else. Trust, but keep the evidence in the same field of view.\n\nThe reviewer is read-only. If I want a fix, that's a new, scoped task in the implementation tab."
+    },
+    {
+      "type": "statement",
+      "title": "Tall for agents.\nShort for shells.",
+      "notes": "Rule three, about panes.\n\nAgents produce long, structured output (plans, findings, tables), so they get full-height vertical splits, side by side: prefix v.\n\nShells, test runners, git log, and diffstats are glanceable, so they get short horizontal splits stacked in a utility column: prefix minus.\n\nOne pane is one agent, one context window, one job. When the job is done, end the conversation. New job, new agent, clean context.\n\nKeys (prefix is ctrl+b): v split vertical, - split horizontal, h/j/k/l move, z zoom, r resize, c new tab, shift+n new space, w space picker, b sidebar, q detach, ? help.\nRef: https://herdr.dev/docs/configuration/"
+    },
+    {
+      "type": "bigfact",
+      "title": "32:9",
+      "subtitle": "5120 × 1440",
+      "notes": "The cheat code. A 5120×1440 ultrawide: two 2560×1440 screens fused, no bezel in the middle.\n\nAt normal terminal font sizes that's three or four full-height agent columns, plus a utility column, plus the sidebar, all visible at once.\n\nThe next two slides show the same tab at both widths."
+    },
+    {
+      "type": "image",
+      "title": "Half the screen",
+      "image": "07-half-ultrawide-implementation-16x9.png",
+      "notes": "The same implementation tab at 2560×1440, a normal 16:9 screen.\n\nWorkable. Tight. Two agents and a utility column, and you're already making choices. Add a third agent and you're zooming panes in and out all day."
+    },
+    {
+      "type": "image",
+      "title": "The whole screen",
+      "image": "02-ultrawide-implementation-tab.png",
+      "notes": "Same tab on the full ultrawide.\n\nThe difference isn't 'more stuff.' It's that nothing is hidden. A blocked agent costs you time silently. Herdr's sidebar tells you THAT something is blocked; having it physically on screen tells you WHY, in peripheral vision, without moving.\n\nThe less effort it takes to notice, the shorter the stall."
+    },
+    {
+      "type": "statement",
+      "title": "Words are the interface",
+      "notes": "Turn. Everything so far is plumbing. The water is language.\n\nA vague word in a chat gets you a vague paragraph. A vague word in an agent prompt gets you a nine-file diff.\n\nI've written about this before:\n- Precision in Words, Precision in Code: https://compositecode.blog/2024/12/09/precision-in-words-precision-in-code-the-power-of-writing-in-modern-development/\n- AI Prompt Engineering: Mastering Language Constructs: https://compositecode.blog/2025/02/25/ai-prompt-engineering-mastering-language-constructs/\n\nThe next three slides are real prompts and real responses from the demo."
+    },
+    {
+      "type": "image",
+      "title": "Use the glossary. Ban the rest.",
+      "image": "11-crop-domain-model-output.png",
+      "notes": "Prompt: \"Read docs/domain.md and internal/ledger/entry.go. Using only the domain terms Account, Entry, Journal, and Posting (never 'transaction'), describe a Posting aggregate: its invariants, what it owns, and what it must reject. Do not write code.\"\n\nAccurate language means the same word means the same thing every time: docs, code, prompt, review. That's ubiquitous language from DDD. Agents need it more than people do, because they fill every gap with the statistically likely meaning, which is rarely yours.\n\n'Transaction' is banned because in a ledger it's overloaded: a database transaction, a business event, a statement line.\n\nResult: the model stays inside the vocabulary AND marks which rules it inferred versus which came from the repo.\n\nRefs:\n- Notes repos, where the glossary lives: https://compositecode.blog/2026/09/25/notes-repos-as-shared-project-context/\n- Fowler, Ubiquitous Language: https://martinfowler.com/bliki/UbiquitousLanguage.html"
+    },
+    {
+      "type": "image",
+      "title": "Scope first",
+      "image": "09-crop-agent-asks-about-scope.png",
+      "notes": "Prompt: \"Scope: cmd/main.go only. Plan a minimal CLI entrypoint that loads a Journal from a JSON file and prints the balance per Account. Do not touch internal/ledger. Keep the planned diff under 50 lines.\"\n\nScope is the first word. Positive fence, negative fence, size as a number.\n\nThe repo had no go.mod, so staying in scope needed a decision. An unfenced agent adds a module, rewires imports, and stubs types in the package I fenced off. This one stopped, went blocked, recommended the in-scope option, and called the other option out of scope.\n\nHerdr flagged it. The ultrawide showed it. One keystroke to answer.\n\nRef: Hurting or Helping Devs? (scope and diff limits): https://compositecode.blog/2026/04/15/hurting-or-helping-devs/"
+    },
+    {
+      "type": "image",
+      "title": "Review means review",
+      "image": "10-crop-pr-review-findings.png",
+      "notes": "Prompt: \"Review the diff main...feature/posting-aggregate. Classify every change as additive, mutative, or destructive. Flag any naming that drifts from docs/domain.md. Report findings as a numbered list with file:line. Do not propose rewrites outside the diff.\"\n\nPrecise verbs: plan, implement, review, and fix are different jobs. Review doesn't mean fix.\n\nSpecify the output shape (numbered, file:line) so it can be checked against the diff pane next door.\n\nBecause the question was precise, the reviewer had attention to spare. It flagged that any Direction other than exactly \"debit\" counts as a credit, and that an empty Posting validates as balanced. That's behavioral drift, the quiet kind.\n\nRef: Additive vs. Mutative vs. Destructive Code Changes: https://compositecode.blog/2026/02/12/additive-vs-mutative-vs-destructive-code-changes-and-why-ai-agents-love-the-wrong-one-at-213am/"
+    },
+    {
+      "type": "bullets",
+      "title": "The prompt shape",
+      "bullets": [
+        "Scope",
+        "Context and vocabulary",
+        "One verb, one job",
+        "Constraints as numbers",
+        "Output shape",
+        "If blocked, stop and ask"
+      ],
+      "notes": "The template I use for Claude Code, Codex, and Cursor alike:\n\nScope: <paths> only. Do not touch: <paths>.\nContext: Read <files / glossary / plan>. Use the terms <A, B, C>; never <overloaded term>.\nTask (plan | implement | review): <one sentence, one job>.\nConstraints: additive only | under N lines | no new dependencies | tests first.\nOutput: numbered list | file:line | severity first | test names first.\nIf anything above is ambiguous or blocks you, stop and ask.\n\nThe last line matters most. It turns 'the agent is stuck' from a silent failure into a blocked state, and Herdr turns that into a dot I can see from across the room.\n\nFront-load context instead of looping for it:\n- Loop Engineering post: https://compositecode.blog/2026/07/15/loop-engineering-is-mostly-just-broken-sdlc-wearing-a-costume/\n- Agent-ready environments: https://compositecode.blog/2026/09/24/agent-ready-local-environments-and-mcp/"
+    },
+    {
+      "type": "statement",
+      "title": "Ask. Plan. Confirm.",
+      "notes": "The gate. No edits until the agent has asked what it needs to ask, shown a plan, and gotten a yes. Approval is scoped to the plan that was approved; if the work grows past it, the agent re-plans.\n\nBacked by tooling: agents start in plan mode (claude --permission-mode plan; Codex and Cursor have their own read-only and ask-first modes).\n\nMy side of the loop:\n- Blocked: answer in place. If the answer is a decision, write it into the notes repo.\n- Done: check the output against the evidence pane. Approve, correct, or open a scoped fix in the implementation tab.\n- Job finished: end that conversation.\n\nRef: https://compositecode.blog/2026/08/20/plan-then-build/"
+    },
+    {
+      "type": "bullets",
+      "title": "Try it",
+      "bullets": [
+        "brew install herdr",
+        "herdr",
+        "ctrl+b  ?"
+      ],
+      "notes": "Getting started takes three lines: install, launch, open help.\n\nThen:\n- Make a space per folder you're working in (prefix shift+n, or herdr workspace create --cwd <dir> --label <name>).\n- Name tabs for the kind of work (prefix shift+t).\n- Agents tall (prefix v), shells short (prefix -).\n- herdr integration install claude (and codex, etc.) for accurate state dots.\n\nWorst case, you've got a nice tmux. Best case, you stop finding agents that have been patiently blocked since lunch.\n\nRefs:\n- https://herdr.dev/docs/quick-start/\n- https://herdr.dev/docs/configuration/"
+    },
+    {
+      "type": "title",
+      "title": "Thanks",
+      "subtitle": "herdr.dev\ncompositecode.blog",
+      "notes": "Draw the boundaries on screen. Draw them again in words. Then let the agents work.\n\nArticles and every screenshot are in this repo:\n- articles/01-herding-agents-with-herdr.md\n- articles/02-why-i-break-it-out-this-way.md\n- images/\n\nRefs:\n- https://herdr.dev\n- https://github.com/herdrdev/herdr\n- https://compositecode.blog/\n- Garr Reynolds, Presentation Zen (the style this deck follows): https://garrreynolds.com/"
+    }
+  ]
+}
