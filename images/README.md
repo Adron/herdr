@@ -25,5 +25,9 @@ Screenshots of [Herdr](https://herdr.dev) 0.8.0 running real Claude Code agents,
 | `09-crop-agent-asks-about-scope.png` | 1640×540 | Close-up: a `Scope: cmd/main.go only` agent stops and asks instead of wandering out of bounds |
 | `10-crop-pr-review-findings.png` | 2460×640 | Close-up: reviewer output, numbered and classified additive / mutative / destructive with `file:line` |
 | `11-crop-domain-model-output.png` | 2460×1120 | Close-up: the Posting aggregate model, using only the agreed vocabulary, with inferred rules marked |
+| `12-hero-herding-agents-with-herdr.png` | 2400×1260 | Hero image for article 01: title over the full-width implementation tab |
+| `13-hero-why-i-break-it-out-this-way.png` | 2400×1260 | Hero image for article 02: title beside the domain-model output and the scope question |
 
-The heights are 1415 rather than 1440 because the macOS menu bar is cropped out.
+The two hero images (1.91:1, the usual featured/social-card ratio) are composed from the screenshots above.
+
+The screenshot heights are 1415 rather than 1440 because the macOS menu bar is cropped out.
