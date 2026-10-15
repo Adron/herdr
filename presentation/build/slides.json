@@ -32,7 +32,18 @@
         "Detach anytime, agents keep working",
         "Knows when an agent needs you"
       ],
-      "notes": "What Herdr is, in four lines.\n\n1. It's built for running AI coding agents: Claude Code, Codex, Cursor's agent, Copilot CLI, OpenCode, Devin, and more.\n2. A single Rust binary. No Electron. It runs inside iTerm, Ghostty, WezTerm, kitty, Alacritty, even inside tmux.\n3. Client/server. A background server owns the terminals; the window is just a client. Close it, drop SSH, and everything keeps running. (While making these screenshots the demo window got closed mid-run; every agent was still there on reattach.)\n4. Agent-state detection. That's the point, and it's coming up.\n\nInstall: brew install herdr, or curl -fsSL https://herdr.dev/install.sh | sh\n\nRefs:\n- https://herdr.dev\n- https://herdr.dev/docs/install/\n- https://github.com/herdrdev/herdr"
+      "notes": "What Herdr is, in four lines.\n\n1. It's built for running AI coding agents: Claude Code, Codex, Cursor's agent, Copilot CLI, OpenCode, Devin, and more.\n2. A single Rust binary. No Electron. It runs inside iTerm, Ghostty, WezTerm, kitty, Alacritty, even inside tmux.\n3. Client/server. A background server owns the terminals; the window is just a client. Close it, drop SSH, and everything keeps running. (While making these screenshots the demo window got closed mid-run; every agent was still there on reattach.)\n4. Agent-state detection. That's the point, and it's coming up.\n\nInstalling it is the next slide, because it's that short.\n\nRefs:\n- https://herdr.dev\n- https://herdr.dev/docs/install/\n- https://github.com/herdrdev/herdr"
+    },
+    {
+      "type": "bullets",
+      "title": "Installs in one line",
+      "bullets": [
+        "brew install herdr",
+        "curl -fsSL https://herdr.dev/install.sh | sh",
+        "herdr",
+        "herdr integration install claude"
+      ],
+      "notes": "Getting Herdr running is about as short as it gets, which matters, because the barrier to trying a new tool is usually the setup, not the tool.\n\n1. brew install herdr on macOS, or the one-line install script anywhere else. It's a single Rust binary: no runtime, no Electron, nothing else to install alongside it.\n2. Run herdr. It starts its background server and attaches you to the default session, inside whatever terminal you already use (iTerm, Ghostty, WezTerm, kitty, Alacritty, even tmux). No config file is required to start.\n3. Optional but worth it: herdr integration install claude (or codex, copilot, opencode…) adds a small hook so each agent reports its own state instead of Herdr inferring it from the screen. herdr integration status shows what's wired.\n\nFrom zero to a working agent workspace in two or three commands. Everything after this in the talk is how I lay it out and how I talk to the agents, not more setup.\n\nRefs:\n- https://herdr.dev/docs/install/\n- https://herdr.dev/docs/quick-start/\n- https://herdr.dev/docs/agents/"
     },
     {
       "type": "statement",

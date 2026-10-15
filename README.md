@@ -21,6 +21,7 @@ herdr-preso-demo/
 │       ├── slides.json                      # Single source for both decks: slide text, images, speaker notes
 │       ├── build_keynote.py                 # Rebuilds the .key natively through Keynote (AppleScript)
 │       └── build_pptx.py                    # Rebuilds the .pptx with python-pptx
+├── topics.md                                # Slide-by-slide topic guide with links, commands, and screenshots
 ├── LICENSE                                  # MIT
 └── README.md
 ```
