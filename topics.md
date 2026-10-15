@@ -45,13 +45,28 @@ How little setup it takes: install, run, and (optionally) wire up the agent hook
 
 ```bash
 brew install herdr                              # macOS
-curl -fsSL https://herdr.dev/install.sh | sh    # anywhere else
+curl -fsSL https://herdr.dev/install.sh | sh    # Linux
 herdr                                           # starts the server, attaches to the default session
 herdr integration install claude                # optional: agent reports its own state (also codex, copilot, opencode…)
 ```
 
 - ✅ No runtime, no Electron, no config file needed to start.
-- 🔗 [Install](https://herdr.dev/docs/install/) · [Quick start](https://herdr.dev/docs/quick-start/) · [Supported agents](https://herdr.dev/docs/agents/)
+
+> 🪟 **Windows note:** Herdr runs natively on Windows (x86_64; ARM64 runs the x86_64 build under emulation). Install from PowerShell:
+>
+> ```powershell
+> powershell -ExecutionPolicy Bypass -c "irm https://herdr.dev/install.ps1 | iex"
+> ```
+>
+> If endpoint security blocks that, use Command Prompt instead:
+>
+> ```cmd
+> curl.exe -fsSLo install.cmd https://herdr.dev/install.cmd && install.cmd && del install.cmd
+> ```
+>
+> The installer puts `herdr` on your PATH. Windows is generally available but has documented limitations, so read [Windows support](https://herdr.dev/docs/windows-beta/) first. Older Windows *preview* installs stay on the preview channel until you run `herdr channel set stable`.
+
+- 🔗 [Install](https://herdr.dev/docs/install/) · [Windows support](https://herdr.dev/docs/windows-beta/) · [Quick start](https://herdr.dev/docs/quick-start/) · [Supported agents](https://herdr.dev/docs/agents/)
 
 ### 6. Session › Space › Tab › Pane
 Herdr's four nouns:
